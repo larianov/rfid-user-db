@@ -1,0 +1,70 @@
+cmake_minimum_required(VERSION 3.25)
+
+set(CARD_ANL_TARGET "embedded" CACHE STRING "Firmware to build: embedded | lib")
+set_property(CACHE CARD_ANL_TARGET PROPERTY STRINGS embedded lib)
+
+if(NOT CARD_ANL_TARGET MATCHES "^(embedded|lib)$")
+    message(FATAL_ERROR
+        "Unknown CARD_ANL_TARGET: ${CARD_ANL_TARGET}. Use 'embedded' or 'lib'")
+endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/pico_sdk_import.cmake)
+
+if(PICO_SDK_VERSION_STRING VERSION_LESS "2.2.0")
+    message(FATAL_ERROR
+        "Pico SDK 2.2.0 or later required. Current: ${PICO_SDK_VERSION_STRING}")
+endif()
+
+project(card_anl VERSION 0.1.0 LANGUAGES C CXX ASM)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+        Debug Release RelWithDebInfo MinSizeRel)
+endif()
+
+pico_sdk_init()
+
+set(CARD_WARNINGS "-Wall;-Wextra;-Wshadow;-Wnull-dereference;-Wpedantic")
+
+find_program(PICOTOOL_EXECUTABLE picotool)
+
+function(card_setup_firmware target)
+    set_source_files_properties(${ARGN}
+        PROPERTIES COMPILE_OPTIONS "${CARD_WARNINGS}"
+    )
+
+    target_compile_options(${target} PRIVATE
+        $<$<CONFIG:Debug>:-Og;-ggdb3>
+    )
+
+    pico_add_extra_outputs(${target})
+
+    if(PICOTOOL_EXECUTABLE)
+        add_custom_target(load
+            COMMAND ${PICOTOOL_EXECUTABLE} load -f -x
+                    $<TARGET_FILE_DIR:${target}>/${target}.uf2
+            DEPENDS ${target}
+            COMMENT "Loading ${target}.uf2 to Pico"
+            USES_TERMINAL
+            VERBATIM
+        )
+    else()
+        message(WARNING "picotool was not found: target 'load' will not be available")
+    endif()
+endfunction()
+
+if(CARD_ANL_TARGET STREQUAL "embedded")
+    add_subdirectory(emb)
+else()
+    add_subdirectory(lib)
+endif()
