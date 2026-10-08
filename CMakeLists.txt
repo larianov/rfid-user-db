@@ -1,13 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(CARD_ANL_TARGET "embedded" CACHE STRING "Firmware to build: embedded | lib")
-set_property(CACHE CARD_ANL_TARGET PROPERTY STRINGS embedded lib)
-
-if(NOT CARD_ANL_TARGET MATCHES "^(embedded|lib)$")
-    message(FATAL_ERROR
-        "Unknown CARD_ANL_TARGET: ${CARD_ANL_TARGET}. Use 'embedded' or 'lib'")
-endif()
-
 include(${CMAKE_CURRENT_LIST_DIR}/pico_sdk_import.cmake)
 
 if(PICO_SDK_VERSION_STRING VERSION_LESS "2.2.0")
@@ -63,8 +55,4 @@ function(card_setup_firmware target)
     endif()
 endfunction()
 
-if(CARD_ANL_TARGET STREQUAL "embedded")
-    add_subdirectory(emb)
-else()
-    add_subdirectory(lib)
-endif()
+add_subdirectory(emb)

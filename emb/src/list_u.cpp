@@ -10,7 +10,7 @@ insert_result list_users::insert_user(uint64_t uid, etl::string_view name, statu
     if (list_of_users.full()) {
         return insert_result::full;
     }
-    if (name.size() >= 15) {
+    if (name.size() > decltype(user::Name)::MAX_SIZE) {
         return insert_result::name_too_long;
     }
     auto [it, ins] = list_of_users.try_emplace(uid, user(name, status_of_user));

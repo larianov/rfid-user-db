@@ -12,50 +12,22 @@
       }
     },
     {
-      "name": "embedded-base",
-      "hidden": true,
-      "inherits": "base",
-      "cacheVariables": { "CARD_ANL_TARGET": "embedded" }
-    },
-    {
-      "name": "lib-base",
-      "hidden": true,
-      "inherits": "base",
-      "cacheVariables": { "CARD_ANL_TARGET": "lib" }
-    },
-    {
       "name": "e",
       "displayName": "Embedded Debug",
-      "inherits": "embedded-base",
+      "inherits": "base",
       "binaryDir": "${sourceDir}/build/embedded-debug",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
     },
     {
       "name": "er",
       "displayName": "Embedded Release",
-      "inherits": "embedded-base",
+      "inherits": "base",
       "binaryDir": "${sourceDir}/build/embedded-release",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
-    },
-    {
-      "name": "l",
-      "displayName": "Lib Debug",
-      "inherits": "lib-base",
-      "binaryDir": "${sourceDir}/build/lib-debug",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
-    },
-    {
-      "name": "lr",
-      "displayName": "Lib Release",
-      "inherits": "lib-base",
-      "binaryDir": "${sourceDir}/build/lib-release",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
     }
   ],
   "buildPresets": [
     { "name": "e",  "configurePreset": "e" },
-    { "name": "er", "configurePreset": "er" },
-    { "name": "l",  "configurePreset": "l" },
-    { "name": "lr", "configurePreset": "lr" }
+    { "name": "er", "configurePreset": "er" }
   ]
 }
